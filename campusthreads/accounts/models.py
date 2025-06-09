@@ -1,8 +1,7 @@
 from django.db import models
-from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from datetime import timedelta, datetime, timezone
-from rest_framework_simplejwt.tokens import Token
+from rest_framework_simplejwt.tokens import AccessToken
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -57,15 +56,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def generate_email_verification_token(self):
-        exp = datetime.now(datetime.timezone.utc) + timedelta(hours=24)
-        token = Token()
+        exp = datetime.now(timezone.utc) + timedelta(hours=24)
+        token = AccessToken()
         token['user_id'] = self.pk
-        token.set_exp(from_time=datetime.now(timedelta.utc), lifetime=timedelta(hours=24))
+        token.set_exp(from_time=datetime.now(timezone.utc), lifetime=timedelta(hours=24))
         token_str = str(token)
         self.email_verification_token = token_str
         self.email_verification_token_expires = exp
         self.save(update_fields=["email_verification_token","email_verification_token_expires"])
         return token_str
+
 
     def verify_email_token(self, token):
         from rest_framework_simplejwt.exceptions import TokenError
@@ -76,12 +76,12 @@ class User(AbstractBaseUser, PermissionsMixin):
             if(
                 token == self.email_verification_token and
                 self.email_verification_token_expires and
-                self.email_verification_token_expires > datetime.now(datetime.timezone.utc)
+                self.email_verification_token_expires > datetime.now(timezone.utc)
             ):
                 self.email_verified = True
                 self.email_verification_token = None
                 self.email_verification_token_expires = None
-                self.save(updated_fields=["email_verified", "email_verification_token", "email_verification_token_expires"])
+                self.save(update_fields=["email_verified", "email_verification_token", "email_verification_token_expires"])
                 return True
         except TokenError:
             return False

@@ -4,13 +4,13 @@ from .models import User
 
 class UserAdmin(BaseUserAdmin):
     model = User
-    list_display = ('email', 'first_name', 'last_name', 'role', 'is_staff', 'is_superuser')
+    list_display = ('email', 'first_name', 'last_name', 'role', 'is_staff', 'is_superuser', 'email_verified')
     list_filter = ('role', 'is_staff', 'is_superuser', 'is_active')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
     readonly_fields = ('date_joined',)
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('email', 'password', 'email_verified')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'role', 'bio', 'profile_picture')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
