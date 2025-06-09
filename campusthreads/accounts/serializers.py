@@ -3,16 +3,16 @@ from rest_framework import serializers
 from accounts.models import User
 
 class RegisterSerializer(serializers.Serializer):
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
+    firstName = serializers.CharField()
+    lastName = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
     role = serializers.CharField()
     
     def create(self, validated_data):
         user = User(
-            first_name = validated_data['first_name'],
-            last_name = validated_data['last_name'],
+            first_name = validated_data['firstName'],
+            last_name = validated_data['lastName'],
             email = validated_data['email'],
             role = validated_data['role'],
         )
