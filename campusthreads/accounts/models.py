@@ -1,8 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from datetime import datetime, timedelta
-import jwt
+from datetime import timedelta, datetime, timezone
+from rest_framework_simplejwt.tokens import Token
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -49,7 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = CustomUserManager()
 
@@ -58,19 +58,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def generate_email_verification_token(self):
         exp = datetime.now(datetime.timezone.utc) + timedelta(hours=24)
-        token = jwt.encode(
-            {"user_id": self.pk, "exp":exp},
-            settings.SECRET_KEY,
-            algorithm="HS256"
-        )
-        self.email_verification_token = token
+        token = Token()
+        token['user_id'] = self.pk
+        token.set_exp(from_time=datetime.now(timedelta.utc), lifetime=timedelta(hours=24))
+        token_str = str(token)
+        self.email_verification_token = token_str
         self.email_verification_token_expires = exp
         self.save(update_fields=["email_verification_token","email_verification_token_expires"])
-        return token
+        return token_str
 
     def verify_email_token(self, token):
+        from rest_framework_simplejwt.exceptions import TokenError
+        from rest_framework_simplejwt.tokens import UntypedToken
+        
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            payload = UntypedToken(token)
             if(
                 token == self.email_verification_token and
                 self.email_verification_token_expires and
@@ -81,8 +83,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                 self.email_verification_token_expires = None
                 self.save(updated_fields=["email_verified", "email_verification_token", "email_verification_token_expires"])
                 return True
-        except jwt.ExpiredSignatureError:
-            return False
-        except jwt.InvalidTokenError:
+        except TokenError:
             return False
         return False
