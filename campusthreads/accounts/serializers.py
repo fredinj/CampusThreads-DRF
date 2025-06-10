@@ -24,3 +24,23 @@ class RegisterSerializer(serializers.Serializer):
         if User.objects.filter(email=validated_data['email']).exists():
             raise serializers.ValidationError("A user with this email already exists.")
         return validated_data
+    
+class UserSerializer(serializers.ModelSerializer):
+    http_method_names = ['put']
+    firstName = serializers.CharField(source='first_name')
+    lastName = serializers.CharField(source='last_name')
+    
+    class Meta:
+        model = User
+        fields = ('firstName', 'lastName', 'email')
+        
+    def update(self, instance, validated_data):     
+        if 'email' in validated_data and validated_data['email'] != instance.email:
+            instance.email_verified = False
+            instance.email = validated_data.pop('email')
+            
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+            
+        instance.save()
+        return instance

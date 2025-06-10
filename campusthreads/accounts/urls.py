@@ -1,9 +1,8 @@
 from django.urls import path
 from rest_framework import routers
-from accounts.views import LoginAPIView, RegisterAPIView, LogoutAPIView, CheckAuthAPIView, VerifyVerificationAPIView, SendVerificationAPIView
+from accounts.views import LoginAPIView, RegisterAPIView, LogoutAPIView, CheckAuthAPIView, VerifyVerificationAPIView, SendVerificationAPIView, UserProfileAPIView
 
 router = routers.DefaultRouter()
-
 
 urlpatterns = [
     path('login/', LoginAPIView.as_view(), name="login-endpoint"),

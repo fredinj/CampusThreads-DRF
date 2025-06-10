@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 from accounts.models import User
-from accounts.serializers import RegisterSerializer
+from accounts.serializers import RegisterSerializer, UserSerializer
 
 
 class LoginAPIView(APIView):
@@ -95,16 +95,6 @@ class SendVerificationAPIView(APIView):
         
         msg.attach_alternative(email_body, "text/html")
         msg.send(fail_silently=False)
-        
-        
-        # send_mail(
-        #     subject="Verify you email - CampusThreads",
-        #     from_email=settings.EMAIL_HOST_USER,
-        #     recipient_list=[user.email],
-        #     message=email_body,
-        #     fail_silently=False,
-        # )
-        
         return Response({ "message": 'Verification email sent successfully.' }, status=status.HTTP_200_OK)
     
 class VerifyVerificationAPIView(APIView):
@@ -121,3 +111,14 @@ class VerifyVerificationAPIView(APIView):
             return Response({"message":"Email verified successfully"}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "An error occurred while verifying your email"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class UserProfileAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
