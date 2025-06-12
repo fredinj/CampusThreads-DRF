@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import CategoryRequest, Category, Comment, Post, Reaction, User 
 
 class UserAdmin(BaseUserAdmin):
     model = User
@@ -22,4 +22,9 @@ class UserAdmin(BaseUserAdmin):
         ),
     )
 
+admin.site.register(CategoryRequest)
+admin.site.register(Category)
+admin.site.register(Comment)
+admin.site.register(Post)
+admin.site.register(Reaction)
 admin.site.register(User, UserAdmin)
