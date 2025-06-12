@@ -14,7 +14,7 @@ class Category(BaseModel):
         null=True
     )
     
-    request_id = models.ForeignKey(
+    category_request = models.ForeignKey(
         "CategoryRequest",
         related_name="category",
         on_delete=models.SET_NULL,

@@ -8,23 +8,19 @@ class Post(BaseModel):
 
     post_likes = models.PositiveIntegerField(default=0)
 
-    author = models.CharField(max_length=60)
-
-    author_id = models.ForeignKey(
+    author = models.ForeignKey(
         "User",
         related_name="posts",
         on_delete=models.SET_NULL,
         null=True
     )
 
-    category_id = models.ForeignKey(
+    category = models.ForeignKey(
         "Category",
         related_name="posts",
         on_delete=models.SET_NULL,
         null=True
     )
-
-    category_name = models.CharField(max_length=20)
 
     tag = models.CharField(max_length=10, default="")
 

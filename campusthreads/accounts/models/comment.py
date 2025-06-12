@@ -4,13 +4,11 @@ from .base_model import BaseModel
 class Comment(BaseModel):
     comment_content = models.CharField(max_length=255)
 
-    author_id = models.ForeignKey(
+    author = models.ForeignKey(
         "User",
         related_name="comments",
         on_delete=models.CASCADE
     )
-
-    author = models.CharField(max_length=50)
 
     post = models.ForeignKey(
         "Post",
