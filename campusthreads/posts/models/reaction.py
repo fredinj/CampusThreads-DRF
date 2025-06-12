@@ -1,5 +1,5 @@
 from django.db import models
-from .base_model import BaseModel
+from campusthreads.base_model import BaseModel
 
 class Reaction(BaseModel):
     TYPE_CHOICES = [
@@ -8,7 +8,7 @@ class Reaction(BaseModel):
     ]
 
     user = models.ForeignKey(
-        "User", 
+        "accounts.User", 
         related_name="reactions",
         on_delete=models.CASCADE
     )

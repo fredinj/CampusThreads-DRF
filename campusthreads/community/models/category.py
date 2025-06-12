@@ -1,6 +1,5 @@
 from django.db import models
-
-from .base_model import BaseModel
+from campusthreads.base_model import BaseModel
 
 class Category(BaseModel):
     name = models.CharField(max_length=20, unique=True)
@@ -8,7 +7,7 @@ class Category(BaseModel):
     description = models.CharField(max_length=255)
     
     requested_by = models.ForeignKey(
-        "User",
+        "accounts.User",
         related_name="categories_created",
         on_delete=models.SET_NULL,
         null=True

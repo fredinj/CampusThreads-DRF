@@ -1,11 +1,11 @@
 from django.db import models
-from .base_model import BaseModel
+from campusthreads.base_model import BaseModel
 
 class Comment(BaseModel):
     comment_content = models.CharField(max_length=255)
 
     author = models.ForeignKey(
-        "User",
+        "accounts.User",
         related_name="comments",
         on_delete=models.CASCADE
     )

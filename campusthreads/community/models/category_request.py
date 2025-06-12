@@ -1,5 +1,5 @@
 from django.db import models
-from .base_model import BaseModel
+from campusthreads.base_model import BaseModel
 
 class CategoryRequest(BaseModel):
     STATUS = [
@@ -13,7 +13,7 @@ class CategoryRequest(BaseModel):
     description = models.CharField(max_length=255)
     
     requested_by = models.ForeignKey(
-        "User",
+        "accounts.User",
         related_name="category_requests",
         on_delete=models.SET_NULL,
         null=True

@@ -1,5 +1,5 @@
 from django.db import models
-from .base_model import BaseModel
+from campusthreads.base_model import BaseModel
 
 class Post(BaseModel):
     post_title = models.CharField(max_length=100)
@@ -9,14 +9,14 @@ class Post(BaseModel):
     post_likes = models.PositiveIntegerField(default=0)
 
     author = models.ForeignKey(
-        "User",
+        "accounts.User",
         related_name="posts",
         on_delete=models.SET_NULL,
         null=True
     )
 
     category = models.ForeignKey(
-        "Category",
+        "community.Category",
         related_name="posts",
         on_delete=models.SET_NULL,
         null=True
