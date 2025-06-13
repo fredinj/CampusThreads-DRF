@@ -26,7 +26,6 @@ class RegisterSerializer(serializers.Serializer):
         return validated_data
     
 class UserSerializer(serializers.ModelSerializer):
-    http_method_names = ['put']
     firstName = serializers.CharField(source='first_name')
     lastName = serializers.CharField(source='last_name')
     

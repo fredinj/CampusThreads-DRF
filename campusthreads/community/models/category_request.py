@@ -22,3 +22,6 @@ class CategoryRequest(BaseModel):
     status = models.CharField(max_length=10, choices=STATUS, default='pending')
 
     tags = models.JSONField(default=list)
+
+    def __str__(self):
+        return f"{self.category_name}"

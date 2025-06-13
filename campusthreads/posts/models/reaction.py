@@ -27,3 +27,6 @@ class Reaction(BaseModel):
             models.Index(fields=['user', 'post']),  # Query optimization
         ]
         unique_together = ['user', 'post']
+
+    def __str__(self):
+        return f"{self.id}"

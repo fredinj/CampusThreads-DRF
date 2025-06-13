@@ -1,10 +1,8 @@
 from django.urls import path
-from rest_framework import routers
 
 from accounts.views import LoginAPIView, RegisterAPIView, LogoutAPIView, CheckAuthAPIView
 from accounts.views import VerifyVerificationAPIView, SendVerificationAPIView, UserProfileAPIView
 
-router = routers.DefaultRouter()
 
 urlpatterns = [
     #Authentication endpoints
@@ -18,5 +16,3 @@ urlpatterns = [
     # User profile endpoints
     path('user/update/', UserProfileAPIView.as_view(), name='user-profile-update')
 ]
-
-urlpatterns += router.urls
