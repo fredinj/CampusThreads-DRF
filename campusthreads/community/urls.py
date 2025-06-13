@@ -1,9 +1,14 @@
 from django.urls import path, include
+from rest_framework import routers
 
-from community.views import CategoryRequestViewSet
+from community.views import CategoryRequestViewSet, CategoryViewSet
 
+router = routers.DefaultRouter()
+
+router.register(r'', CategoryViewSet)
 
 urlpatterns = [
+    # category request endpoints
     path('request/', CategoryRequestViewSet.as_view({
         'post': 'create',
         'get': 'list'
@@ -16,5 +21,8 @@ urlpatterns = [
          name='approve-category-request'),
 
     path('<int:pk>/reject/', CategoryRequestViewSet.as_view({'put': 'reject'}),
-         name='reject-category-request')
+         name='reject-category-request'),
+
+    # category endpoints
+    path('', include(router.urls))
 ]

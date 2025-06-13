@@ -1,12 +1,13 @@
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, DestroyModelMixin
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 
 from community.models import Category, CategoryRequest
-from community.serializers import CategoryRequestSerializer
+from community.serializers import CategoryRequestSerializer, CategorySerializer
 from campusthreads.permissions import IsAdmin, IsTeacherOrAdmin
 
 class CategoryRequestViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
@@ -14,6 +15,7 @@ class CategoryRequestViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
     This viewset creates and lists category requests using the Mixins
     and update the requests using the custom action methods
     '''
+    http_method_names = ['get', 'post', 'put']
     queryset = CategoryRequest.objects.all()
     serializer_class = CategoryRequestSerializer
 
@@ -72,3 +74,24 @@ class CategoryRequestViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
             return [IsAdmin()]
         return []
         
+
+class CategoryViewSet(ListModelMixin, RetrieveModelMixin, DestroyModelMixin, GenericViewSet):
+    http_method_names = ['get', 'put', 'delete']
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    # custom url path and url name for DRF router
+    @action(detail=True, methods=['put'], url_path='update', url_name='update-category')
+    def update_category(self, request, pk=None):
+        instance = self.get_object()        
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+        
+    def get_permissions(self):
+        if self.action in ['update_category', 'destroy']:
+            return [IsTeacherOrAdmin()]
+        elif self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return []
