@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from community.views import CategoryRequestViewSet, CategoryViewSet
+from community.views import CategoryRequestViewSet, CategoryViewSet, SubscribedCategoriesApiView
 
 router = routers.DefaultRouter()
 
@@ -24,5 +24,6 @@ urlpatterns = [
          name='reject-category-request'),
 
     # category endpoints
-    path('', include(router.urls))
+    path('<int:user_id>/categories/', SubscribedCategoriesApiView.as_view(), name='subscribed-categories'),
+    path('', include(router.urls)),
 ]

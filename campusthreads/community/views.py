@@ -5,10 +5,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
 from community.models import Category, CategoryRequest
 from community.serializers import CategoryRequestSerializer, CategorySerializer
 from campusthreads.permissions import IsAdmin, IsTeacherOrAdmin
+from accounts.models import User
 
 class CategoryRequestViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
     '''
@@ -76,6 +79,9 @@ class CategoryRequestViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
         
 
 class CategoryViewSet(ListModelMixin, RetrieveModelMixin, DestroyModelMixin, GenericViewSet):
+    '''
+    List all, retrieve one, delete, and update category
+    '''
     http_method_names = ['get', 'put', 'delete']
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -95,3 +101,14 @@ class CategoryViewSet(ListModelMixin, RetrieveModelMixin, DestroyModelMixin, Gen
         elif self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
         return []
+
+
+class SubscribedCategoriesApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        if user != request.user:
+            return Response({"message": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+        categories = user.categories.values('id', 'name')
+        return Response(list(categories))

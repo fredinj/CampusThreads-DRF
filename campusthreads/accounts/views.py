@@ -40,7 +40,7 @@ class LogoutAPIView(APIView):
     # commenting to make it easier to test with postman
     # permission_classes = [permissions.IsAuthenticated]
 
-    # refresh tokens aren't used for now so we're sending a dummy response
+    # refresh tokens aren't used for now, so we're sending a dummy response
     def post(self, request):
         return Response({"message": "Logged out successfully"})
 
