@@ -23,7 +23,7 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ('student', 'Student'),
-        ('teacher', 'teacher'),
+        ('teacher', 'Teacher'),
         ('admin', 'Admin'),
     ]
     ACCOUNT_STATUS_CHOICES = [
@@ -47,6 +47,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    categories = models.ManyToManyField(
+        'community.Category',
+        blank=True,
+        related_name='subscribers',
+        verbose_name='Subscribed Categories'
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
@@ -57,10 +63,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def generate_email_verification_token(self):
-        exp = datetime.now(timezone.utc) + timedelta(minutes=30)
+        expiry_time = timedelta(minutes=30)
+        exp = datetime.now(timezone.utc) + expiry_time
         token = AccessToken()
         token['user_id'] = self.pk
-        token.set_exp(from_time=datetime.now(timezone.utc), lifetime=timedelta(hours=24))
+        token.set_exp(from_time=datetime.now(timezone.utc), lifetime=expiry_time)
         token_str = str(token)
         self.email_verification_token = token_str
         self.email_verification_token_expires = exp

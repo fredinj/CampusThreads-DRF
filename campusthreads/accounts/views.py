@@ -5,10 +5,15 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.decorators import action
+from rest_framework.generics import ListAPIView
+from django.shortcuts import get_object_or_404
 
 from accounts.models import User
 from accounts.serializers import RegisterSerializer, UserSerializer
-
+from community.models import Category
+from posts.serializers import UserCommentSerializer, UserPostSerializer
 
 class LoginAPIView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -48,7 +53,7 @@ class CheckAuthAPIView(APIView):
         return Response({
             "authenticated": True,
             "user": {
-                "id": user.id,
+                "_id": user.id,
                 "email": user.email,
                 "role": user.role,
                 "firstName": user.first_name,
@@ -122,3 +127,40 @@ class UserProfileAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+class CategorySubscriptionViewSet(GenericViewSet):
+    queryset = Category.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=True, methods=['put'])
+    def subscribe(self, request, pk=None):
+        category = self.get_object()
+        request.user.categories.add(category)
+        return Response({"message": "Subscribed successfully"}, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['put'])
+    def unsubscribe(self, request, pk=None):
+        category = self.get_object()
+        request.user.categories.remove(category)
+        return Response({"message": "Unsubscribed successfully"}, status=status.HTTP_200_OK)
+    
+
+class UserPostsApiView(ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserPostSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = get_object_or_404(User, id=user_id)
+        return user.posts.all().order_by('-created_at')
+    
+
+class UserCommentsApiView(ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserCommentSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = get_object_or_404(User, id=user_id)
+        return user.comments.all().order_by('-created_at')

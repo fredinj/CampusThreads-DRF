@@ -4,7 +4,7 @@ from .models import User
 
 class UserAdmin(BaseUserAdmin):
     model = User
-    list_display = ('email', 'first_name', 'last_name', 'role', 'email_verified', 'is_staff', 'is_superuser')
+    list_display = ('id', 'email', 'first_name', 'last_name', 'role', 'email_verified', 'is_staff', 'is_superuser')
     list_filter = ('role', 'is_staff', 'is_superuser', 'is_active')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
@@ -14,6 +14,7 @@ class UserAdmin(BaseUserAdmin):
         ('Personal info', {'fields': ('first_name', 'last_name', 'role', 'bio', 'profile_picture')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Community', {'fields': ('categories',)}),
     )
     add_fieldsets = (
         (None, {
